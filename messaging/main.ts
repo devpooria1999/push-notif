@@ -27,7 +27,7 @@ async function resetUI() {
   let swRegistration: ServiceWorkerRegistration | undefined;
   if ('serviceWorker' in navigator) {
     try {
-      swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      swRegistration = await navigator.serviceWorker.register('/public/firebase-messaging-sw.js');
       console.log('Service Worker registered:', swRegistration);
     } catch (err) {
       console.warn('Service Worker registration failed:', err);
