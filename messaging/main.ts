@@ -20,12 +20,30 @@ onMessage(messaging, (payload) => {
   appendMessage(payload);
 });
 
-function resetUI() {
+async function resetUI() {
   clearMessages();
   showToken('loading...');
+  // Register service worker (required when not using Firebase Hosting)
+  let swRegistration: ServiceWorkerRegistration | undefined;
+  if ('serviceWorker' in navigator) {
+    try {
+      swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      console.log('Service Worker registered:', swRegistration);
+    } catch (err) {
+      console.warn('Service Worker registration failed:', err);
+      swRegistration = undefined;
+    }
+  } else {
+    console.warn('Service Workers are not supported in this browser.');
+  }
+
   // Get registration token. Initially this makes a network call, once retrieved
-  // subsequent calls to getToken will return from cache.
-  getToken(messaging, { vapidKey }).then((currentToken) => {
+  // subsequent calls to getToken will return from cache. Pass the service
+  // worker registration when available so background messages work.
+  const tokenOptions: any = { vapidKey };
+  if (swRegistration) tokenOptions.serviceWorkerRegistration = swRegistration;
+
+  getToken(messaging, tokenOptions).then((currentToken) => {
     if (currentToken) {
       sendTokenToServer(currentToken);
       updateUIForPushEnabled(currentToken);

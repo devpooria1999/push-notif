@@ -1,9 +1,23 @@
 // Import and configure the Firebase SDK
 // These scripts are made available when the app is served or deployed on Firebase Hosting
 // If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup
-importScripts('/__/firebase/9.2.0/firebase-app-compat.js');
-importScripts('/__/firebase/9.2.0/firebase-messaging-compat.js');
-importScripts('/__/firebase/init.js');
+// Use the CDN bundles so this service worker works even when not hosted
+// on Firebase Hosting.
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
+
+// Initialize the Firebase app in the service worker with the same
+// configuration as the main app. Replace values below with your
+// project's config from `config.ts` if they change.
+firebase.initializeApp({
+  apiKey: "AIzaSyCdYQbXIF_M2m0US25uW9Y5WAyogzO-Js8",
+  authDomain: "push-notif-67601998-e27b7.firebaseapp.com",
+  projectId: "push-notif-67601998-e27b7",
+  storageBucket: "push-notif-67601998-e27b7.firebasestorage.app",
+  messagingSenderId: "890893705492",
+  appId: "1:890893705492:web:5c124845e7d5976047e201",
+  measurementId: "G-FBR073MF3Q"
+});
 
 const messaging = firebase.messaging();
 
