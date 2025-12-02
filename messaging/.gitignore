@@ -1,2 +1,8 @@
 dist/
 /.firebase/
+node_modules/
+.env
+.DS_Store
+.vscode/
+.idea/
+*.log
