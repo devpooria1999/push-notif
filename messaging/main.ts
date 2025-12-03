@@ -1,4 +1,3 @@
-import { initializeApp } from 'firebase/app';
 import {
   deleteToken,
   getMessaging,
@@ -6,9 +5,9 @@ import {
   MessagePayload,
   onMessage,
 } from 'firebase/messaging';
-import { firebaseConfig, vapidKey } from './config';
+import { vapidKey } from './config';
 
-initializeApp(firebaseConfig);
+// initializeApp(firebaseConfig);
 
 const messaging = getMessaging();
 
@@ -58,7 +57,7 @@ async function resetUI() {
         updateUIForPushEnabled(currentToken);
       } else {
         // Show permission request.
-        console.log(
+        console.warn(
           'No registration token available. Request permission to generate one.',
         );
         // Show permission UI.
