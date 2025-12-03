@@ -35,7 +35,6 @@ async function resetUI() {
     try {
       swRegistration = await navigator.serviceWorker.register(
         '/firebase-messaging-sw.js',
-        { scope: './' },
       );
       console.log('Service Worker registered:', swRegistration);
     } catch (err) {

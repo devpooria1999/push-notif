@@ -77,16 +77,16 @@ messaging.onBackgroundMessage(function (payload) {
   // Customize notification here
   // const notificationTitle = 'Background Message Title';
 
-  self.registration.showNotification(payload.notification.title, {
-    body: payload.notification.body || 'BODY',
-    title: payload.notification.title || 'TITLE.',
-    icon: '/firebase-logo.png',
-    image: payload.notification.image || '/firebase-logo.png',
-    badge: '/firebase-logo.png',
-    requireInteraction: true,
-    vibrate: 100000,
-    data: payload.data,
-  });
+  // self.registration.showNotification(payload.notification.title, {
+  //   body: payload.notification.body || 'BODY',
+  //   title: payload.notification.title || 'TITLE.',
+  //   icon: '/firebase-logo.png',
+  //   image: payload.notification.image || '/firebase-logo.png',
+  //   badge: '/firebase-logo.png',
+  //   requireInteraction: true,
+  //   vibrate: [200, 100, 200, 100, 200, 100, 200],
+  //   data: payload.data,
+  // });
 });
 self.addEventListener('notificationclick', (event) => {
   console.log('=>(firebase-messaging-sw.js:85) event', event);
