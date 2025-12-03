@@ -73,16 +73,16 @@ messaging.onBackgroundMessage(function (payload) {
     icon: '/firebase-logo.png',
     badge: '/firebase-logo.png',
     requireInteraction: true,
-    vibrate: 1000,
+    vibrate: 100000,
     data: {
       deep_link: 'my.irfarabi.com',
     },
   };
-  self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-    const url = event.notification?.data?.deep_link || '/';
-    event.waitUntil(self.clients.openWindow(url));
-  });
-
   self.registration.showNotification(notificationTitle, notificationOptions);
+});
+self.addEventListener('notificationclick', (event) => {
+  console.log('=>(firebase-messaging-sw.js:85) event', event);
+  event.notification.close();
+  const url = event.notification?.data?.deep_link || '/';
+  event.waitUntil(self.clients.openWindow('/' + url));
 });
