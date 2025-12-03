@@ -10,6 +10,14 @@ importScripts(
   'https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js',
 );
 
+const addResourcesToCache = async (resources) => {
+  const cache = await caches.open('v1');
+  await cache.addAll(resources);
+};
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(addResourcesToCache(['/index.html']));
+});
 // Initialize the Firebase app in the service worker with the same
 // configuration as the main app. Replace values below with your
 // project's config from `config.ts` if they change.
@@ -68,21 +76,24 @@ messaging.onBackgroundMessage(function (payload) {
   );
   // Customize notification here
   const notificationTitle = 'Background Message Title';
-  const notificationOptions = {
-    body: 'Background Message body.',
+
+  self.registration.showNotification(notificationTitle, {
+    body: payload.notification.body || 'BODY',
+    title: payload.notification.title || 'TITLE.',
     icon: '/firebase-logo.png',
+    image: payload.notification.image || '/firebase-logo.png',
     badge: '/firebase-logo.png',
     requireInteraction: true,
     vibrate: 100000,
     data: {
       deep_link: 'my.irfarabi.com',
     },
-  };
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  });
 });
 self.addEventListener('notificationclick', (event) => {
   console.log('=>(firebase-messaging-sw.js:85) event', event);
   event.notification.close();
   const url = event.notification?.data?.deep_link || '/';
-  event.waitUntil(self.clients.openWindow('/' + url));
+  self.clients.openWindow(url);
+  event.waitUntil(self.clients.openWindow(url));
 });
