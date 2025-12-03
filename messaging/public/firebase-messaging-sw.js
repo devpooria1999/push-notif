@@ -3,20 +3,24 @@
 // If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup
 // Use the CDN bundles so this service worker works even when not hosted
 // on Firebase Hosting.
-importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
+importScripts(
+  'https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js',
+);
+importScripts(
+  'https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js',
+);
 
 // Initialize the Firebase app in the service worker with the same
 // configuration as the main app. Replace values below with your
 // project's config from `config.ts` if they change.
 firebase.initializeApp({
-  apiKey: "AIzaSyCdYQbXIF_M2m0US25uW9Y5WAyogzO-Js8",
-  authDomain: "push-notif-67601998-e27b7.firebaseapp.com",
-  projectId: "push-notif-67601998-e27b7",
-  storageBucket: "push-notif-67601998-e27b7.firebasestorage.app",
-  messagingSenderId: "890893705492",
-  appId: "1:890893705492:web:5c124845e7d5976047e201",
-  measurementId: "G-FBR073MF3Q"
+  apiKey: 'AIzaSyCdYQbXIF_M2m0US25uW9Y5WAyogzO-Js8',
+  authDomain: 'push-notif-67601998-e27b7.firebaseapp.com',
+  projectId: 'push-notif-67601998-e27b7',
+  storageBucket: 'push-notif-67601998-e27b7.firebasestorage.app',
+  messagingSenderId: '890893705492',
+  appId: '1:890893705492:web:5c124845e7d5976047e201',
+  measurementId: 'G-FBR073MF3Q',
 });
 
 const messaging = firebase.messaging();
@@ -35,14 +39,14 @@ const messaging = firebase.messaging();
  // your app's Firebase config object.
  // https://firebase.google.com/docs/web/setup#config-object
  firebase.initializeApp({
-   apiKey: 'api-key',
-   authDomain: 'project-id.firebaseapp.com',
-   databaseURL: 'https://project-id.firebaseio.com',
-   projectId: 'project-id',
-   storageBucket: 'project-id.appspot.com',
-   messagingSenderId: 'sender-id',
-   appId: 'app-id',
-   measurementId: 'G-measurement-id',
+ apiKey: 'api-key',
+ authDomain: 'project-id.firebaseapp.com',
+ databaseURL: 'https://project-id.firebaseio.com',
+ projectId: 'project-id',
+ storageBucket: 'project-id.appspot.com',
+ messagingSenderId: 'sender-id',
+ appId: 'app-id',
+ measurementId: 'G-measurement-id',
  });
 
  // Retrieve an instance of Firebase Messaging so that it can handle background
@@ -50,16 +54,18 @@ const messaging = firebase.messaging();
  const messaging = firebase.messaging();
  **/
 
-
 // If you would like to customize notifications that are received in the
 // background (Web app is closed or not in browser focus) then you should
 // implement this optional method.
-// Keep in mind that FCM will still show notification messages automatically 
+// Keep in mind that FCM will still show notification messages automatically
 // and you should use data messages for custom notifications.
-// For more info see: 
+// For more info see:
 // https://firebase.google.com/docs/cloud-messaging/concept-options
 messaging.onBackgroundMessage(function (payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  console.log(
+    '[firebase-messaging-sw.js] Received background message ',
+    payload,
+  );
   // Customize notification here
   const notificationTitle = 'Background Message Title';
   const notificationOptions = {
@@ -67,8 +73,16 @@ messaging.onBackgroundMessage(function (payload) {
     icon: '/firebase-logo.png',
     badge: '/firebase-logo.png',
     requireInteraction: true,
+    vibrate: 1000,
+    data: {
+      deep_link: 'my.irfarabi.com',
+    },
   };
+  self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const url = event.notification?.data?.deep_link || '/';
+    event.waitUntil(self.clients.openWindow(url));
+  });
 
-  self.registration.showNotification(notificationTitle,
-    notificationOptions);
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
