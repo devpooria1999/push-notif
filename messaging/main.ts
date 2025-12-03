@@ -1,3 +1,4 @@
+import { initializeApp } from 'firebase/app';
 import {
   deleteToken,
   getMessaging,
@@ -5,9 +6,9 @@ import {
   MessagePayload,
   onMessage,
 } from 'firebase/messaging';
-import { vapidKey } from './config';
+import { firebaseConfig, vapidKey } from './config';
 
-// initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
 const messaging = getMessaging();
 
