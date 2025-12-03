@@ -38,13 +38,6 @@ async function resetUI() {
         { scope: './' },
       );
       console.log('Service Worker registered:', swRegistration);
-
-      navigator.serviceWorker.addEventListener('message', (e) => {
-        console.log('=>(main.ts:44) e', e);
-        if (e.data?.deep_link) {
-          window.open(e.data?.deep_link, '_blank');
-        }
-      });
     } catch (err) {
       console.warn('Service Worker registration failed:', err);
       swRegistration = undefined;

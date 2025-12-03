@@ -75,9 +75,9 @@ messaging.onBackgroundMessage(function (payload) {
     payload,
   );
   // Customize notification here
-  const notificationTitle = 'Background Message Title';
+  // const notificationTitle = 'Background Message Title';
 
-  self.registration.showNotification(notificationTitle, {
+  self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body || 'BODY',
     title: payload.notification.title || 'TITLE.',
     icon: '/firebase-logo.png',
@@ -85,15 +85,13 @@ messaging.onBackgroundMessage(function (payload) {
     badge: '/firebase-logo.png',
     requireInteraction: true,
     vibrate: 100000,
-    data: {
-      deep_link: 'my.irfarabi.com',
-    },
+    data: payload.data,
   });
 });
 self.addEventListener('notificationclick', (event) => {
   console.log('=>(firebase-messaging-sw.js:85) event', event);
   event.notification.close();
   const url = event.notification?.data?.deep_link || '/';
-  self.clients.openWindow(url);
+  console.log("=>(firebase-messaging-sw.js:95) url", url);
   event.waitUntil(self.clients.openWindow(url));
 });
