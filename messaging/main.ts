@@ -1,5 +1,7 @@
-import { MessagePayload } from 'firebase/messaging';
+import { getMessaging, getToken, MessagePayload } from 'firebase/messaging';
 import { vapidKey } from './config';
+// modular Firebase (page/window context) — TypeScript-ready
+import { getApp, getApps } from 'firebase/app';
 
 // initializeApp(firebaseConfig);
 
@@ -16,7 +18,7 @@ const permissionDivId = 'permission_div';
 // onMessage(messaging, (payload) => {
 //   console.log('Message received. ', payload);
 //   Update the UI to include the received message.
-  // appendMessage(payload);
+// appendMessage(payload);
 // });
 
 async function resetUI() {
@@ -30,7 +32,6 @@ async function resetUI() {
         '/firebase-messaging-sw.js',
       );
       console.log('Service Worker registered:', swRegistration);
-      requestPermission();
     } catch (err) {
       console.warn('Service Worker registration failed:', err);
       swRegistration = undefined;
@@ -110,6 +111,7 @@ function requestPermission() {
   Notification.requestPermission().then((permission) => {
     if (permission === 'granted') {
       console.log('Notification permission granted.');
+      getFcmTokenOnce(vapidKey);
       // TODO(developer): Retrieve a registration token for use with FCM.
       // In many cases once an app has been granted notification permission,
       // it should update its UI reflecting this.
@@ -180,3 +182,30 @@ document
 //   .addEventListener('click', deleteTokenFromFirebase);
 
 resetUI();
+
+async function getFcmTokenOnce(vapidKey: string) {
+  // ensure app is initialized (don't re-init if already initialized)
+  const app = getApps().length;
+  console.log("=>(main.ts:189) app", app);
+  if (!app) return;
+  console.log('=>(main.ts:191) app', app);
+  const messaging = getMessaging(getApp());
+
+  // ensure the service worker is registered and active
+  const reg = await navigator.serviceWorker.register(
+    '/firebase-messaging-sw.js',
+  );
+  await navigator.serviceWorker.ready;
+
+  try {
+    const token = await getToken(messaging, {
+      vapidKey,
+      serviceWorkerRegistration: reg,
+    });
+    console.log('=>(main.ts:203) token', token);
+    return token; // may be null if permission not granted
+  } catch (err) {
+    console.error('getToken error', err);
+    throw err;
+  }
+}

@@ -23,10 +23,10 @@ messaging.onBackgroundMessage(function (payload) {
 
   // If server sends a `notification` object, the browser may auto-display it.
   // If you send data-only messages, show custom notification here:
-  if (payload?.notification && Object.keys(payload.notification).length) {
-    // browser may have shown it automatically — skip or handle as needed
-    return;
-  }
+  // if (payload?.notification && Object.keys(payload.notification).length) {
+  //   // browser may have shown it automatically — skip or handle as needed
+  //   return;
+  // }
 
   const title = payload?.notification?.title || 'Background message';
   const options = {
