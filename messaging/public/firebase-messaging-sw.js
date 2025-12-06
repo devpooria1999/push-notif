@@ -66,9 +66,9 @@ messaging.onBackgroundMessage((payload) => {
   self.registration.showNotification(payload.notification.title, {
     body: payload.notification.body || 'BODY',
     title: payload.notification.title || 'TITLE.',
-    icon: '/firebase-logo.png',
+    icon: payload.notification.image || '/firebase-logo.png',
     image: payload.notification.image || '/firebase-logo.png',
-    badge: '/firebase-logo.png',
+    badge: payload.notification.image || '/firebase-logo.png',
     requireInteraction: true,
     vibrate: [200, 100, 200, 100, 200, 100, 200],
     data: payload.data,
