@@ -1,83 +1,69 @@
 // /public/firebase-messaging-sw.js
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import {
-  getMessaging,
-  getToken,
-  onBackgroundMessage,
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging/sw.js';
-import './config-sw.js';
 
-const app = initializeApp(self.FIREBASE_CONFIG);
-const messaging = getMessaging(app);
+importScripts(
+  'https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js',
+);
+importScripts(
+  'https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js',
+);
+importScripts('./config-sw.js');
 
-getToken(messaging, {
-  vapidKey: self.vapidKey,
-  serviceWorkerRegistration: self.registration,
-})
-  .then((token) => token && console.log(token))
-  .catch((e) => console.error('Token error:', e));
+firebase.initializeApp(self.FIREBASE_CONFIG);
+const messaging = firebase.messaging();
 
-onBackgroundMessage(messaging, (payload) => {
-  console.log('=>(firebase-messaging-sw.js:22) payload', payload);
-  const title = payload?.notification?.title || 'Background message';
-  const options = {
-    body: payload?.notification?.body || '',
-    icon: payload?.notification?.image || '/firebase-logo.png',
-    image: payload?.notification?.image || '/firebase-logo.png',
-    data: payload?.data || {},
-    requireInteraction: true,
-    vibrate: [200, 100, 200, 100, 200, 100, 200],
-  };
+// THIS IS THE KEY LINE
 
-  self.registration.showNotification(title, options);
-});
+messaging
+  .getToken({
+    vapidKey: self.vapidKey,
+    serviceWorkerRegistration: self.registration, // ← THIS FIXES IT
+  })
+  .then((token) => {
+    console.log(
+      '=>(firebase-messaging-sw.js:16) self.registration',
+      self.registration,
+    );
+    if (token) {
+      console.log('FCM Token:', token);
+      sendTokenToClients(token);
+    } else {
+      console.log('No token — permission blocked?');
+    }
+  })
+  .catch((err) => {
+    console.error('getToken failed:', err);
+  });
 
-// function sendTokenToMainApp(token) {
-//   self.clients
-//     .matchAll({ type: 'window', includeUncontrolled: true })
-//     .then((clients) => {
-//       clients.forEach((client) => {
-//         client.postMessage({
-//           type: 'FCM_TOKEN',
-//           token: token,
-//         });
-//       });
-//     });
-// }
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('v1').then((cache) => cache.addAll(['/index.html'])),
-  );
-});
-
-// Background message handler (customize as needed)
-// messaging.onBackgroundMessage(function (payload) {
-//   console.log('[firebase-messaging-sw] Received background message: ', payload);
-//
-//   // If server sends a `notification` object, the browser may auto-display it.
-//   // If you send data-only messages, show custom notification here:
-//   // if (payload?.notification && Object.keys(payload.notification).length) {
-//   //   // browser may have shown it automatically — skip or handle as needed
-//   //   return;
-//   // }
-//
-//   const title = payload?.notification?.title || 'Background message';
-//   const options = {
-//     body: payload?.notification?.body || '',
-//     icon: payload?.notification?.image || '/firebase-logo.png',
-//     image: payload?.notification?.image || '/firebase-logo.png',
-//     data: payload?.data || {},
-//     requireInteraction: true,
-//     vibrate: [200, 100, 200, 100, 200, 100, 200],
-//   };
-//
-//   self.registration.showNotification(title, options);
+// Optional: token refresh
+// messaging.onTokenRefresh(() => {
+//   messaging
+//     .getToken({
+//       vapidKey: self.vapidKey,
+//       serviceWorkerRegistration: self.registration,
+//     })
+//     .then(sendTokenToClients);
 // });
 
-self.addEventListener('notificationclick', (event) => {
-  console.log('=>(firebase-messaging-sw.js:46) event', event);
-  event.notification.close();
-  const url = event.notification?.data?.deep_link || '/';
-  event.waitUntil(self.clients.openWindow(url));
+function sendTokenToClients(token) {
+  self.clients
+    .matchAll({ type: 'window', includeUncontrolled: true })
+    .then((clients) => {
+      for (const client of clients) {
+        client.postMessage({
+          type: 'FCM_TOKEN',
+          token,
+        });
+      }
+    });
+}
+
+// Background notifications
+messaging.onBackgroundMessage((payload) => {
+  const title = payload.notification?.title || 'New message';
+  const options = {
+    body: payload.notification?.body,
+    icon: '/favicon.ico',
+    data: { url: payload.data?.click_action || '/' },
+  };
+  self.registration.showNotification(title, options);
 });

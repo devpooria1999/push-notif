@@ -9,9 +9,6 @@ async function initPush() {
   try {
     const registration = await navigator.serviceWorker.register(
       '/firebase-messaging-sw.js',
-      {
-        type: 'module',
-      },
     );
     console.log('=>(main.ts:11) registration', registration);
     await navigator.serviceWorker.ready;
@@ -24,7 +21,6 @@ async function initPush() {
         const token = event.data.token;
         console.log('Received FCM token in main app:', token);
         // Send to your backend
-        sendTokenToServer(token);
       }
     });
 
@@ -37,15 +33,6 @@ async function initPush() {
   } catch (err) {
     console.error('SW registration failed:', err);
   }
-}
-
-function sendTokenToServer(token: string) {
-  // your API call
-  fetch('/api/save-fcm-token', {
-    method: 'POST',
-    body: JSON.stringify({ token }),
-    headers: { 'Content-Type': 'application/json' },
-  });
 }
 
 // Call it
