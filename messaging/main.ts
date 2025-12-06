@@ -1,16 +1,9 @@
-import { initializeApp } from 'firebase/app';
-import {
-  deleteToken,
-  getMessaging,
-  getToken,
-  MessagePayload,
-  onMessage,
-} from 'firebase/messaging';
-import { firebaseConfig, vapidKey } from './config';
+import { MessagePayload } from 'firebase/messaging';
+import { vapidKey } from './config';
 
-initializeApp(firebaseConfig);
+// initializeApp(firebaseConfig);
 
-const messaging = getMessaging();
+// const messaging = getMessaging();
 
 // IDs of divs that display registration token UI or request permission UI.
 const tokenDivId = 'token_div';
@@ -20,15 +13,15 @@ const permissionDivId = 'permission_div';
 // - a message is received while the app has focus
 // - the user clicks on an app notification created by a service worker
 //   `messaging.onBackgroundMessage` handler.
-onMessage(messaging, (payload) => {
-  console.log('Message received. ', payload);
-  // Update the UI to include the received message.
-  appendMessage(payload);
-});
+// onMessage(messaging, (payload) => {
+//   console.log('Message received. ', payload);
+//   Update the UI to include the received message.
+  // appendMessage(payload);
+// });
 
 async function resetUI() {
-  clearMessages();
-  showToken('loading...');
+  // clearMessages();
+  // showToken('loading...');
   // Register service worker (required when not using Firebase Hosting)
   let swRegistration: ServiceWorkerRegistration | undefined;
   if ('serviceWorker' in navigator) {
@@ -37,6 +30,7 @@ async function resetUI() {
         '/firebase-messaging-sw.js',
       );
       console.log('Service Worker registered:', swRegistration);
+      requestPermission();
     } catch (err) {
       console.warn('Service Worker registration failed:', err);
       swRegistration = undefined;
@@ -51,26 +45,26 @@ async function resetUI() {
   const tokenOptions: any = { vapidKey };
   if (swRegistration) tokenOptions.serviceWorkerRegistration = swRegistration;
 
-  getToken(messaging, tokenOptions)
-    .then((currentToken) => {
-      if (currentToken) {
-        sendTokenToServer(currentToken);
-        updateUIForPushEnabled(currentToken);
-      } else {
-        // Show permission request.
-        console.warn(
-          'No registration token available. Request permission to generate one.',
-        );
-        // Show permission UI.
-        updateUIForPushPermissionRequired();
-        setTokenSentToServer(false);
-      }
-    })
-    .catch((err) => {
-      console.log('An error occurred while retrieving token. ', err);
-      showToken('Error retrieving registration token.');
-      setTokenSentToServer(false);
-    });
+  // getToken(messaging, tokenOptions)
+  //   .then((currentToken) => {
+  //     if (currentToken) {
+  //       sendTokenToServer(currentToken);
+  //       updateUIForPushEnabled(currentToken);
+  //     } else {
+  //       // Show permission request.
+  //       console.log(
+  //         'No registration token available. Request permission to generate one.',
+  //       );
+  //       // Show permission UI.
+  //       updateUIForPushPermissionRequired();
+  //       setTokenSentToServer(false);
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     console.log('An error occurred while retrieving token. ', err);
+  //     showToken('Error retrieving registration token.');
+  //     setTokenSentToServer(false);
+  //   });
 }
 
 function showToken(currentToken: string) {
@@ -119,33 +113,33 @@ function requestPermission() {
       // TODO(developer): Retrieve a registration token for use with FCM.
       // In many cases once an app has been granted notification permission,
       // it should update its UI reflecting this.
-      resetUI();
+      // resetUI();
     } else {
       console.log('Unable to get permission to notify.');
     }
   });
 }
 
-function deleteTokenFromFirebase() {
-  // Delete registration token.
-  getToken(messaging)
-    .then((currentToken) => {
-      deleteToken(messaging)
-        .then(() => {
-          console.log('Token deleted.', currentToken);
-          setTokenSentToServer(false);
-          // Once token is deleted update UI.
-          resetUI();
-        })
-        .catch((err) => {
-          console.log('Unable to delete token. ', err);
-        });
-    })
-    .catch((err) => {
-      console.log('Error retrieving registration token. ', err);
-      showToken('Error retrieving registration token.');
-    });
-}
+// function deleteTokenFromFirebase() {
+//   // Delete registration token.
+//   getToken(messaging)
+//     .then((currentToken) => {
+//       deleteToken(messaging)
+//         .then(() => {
+//           console.log('Token deleted.', currentToken);
+//           setTokenSentToServer(false);
+//           // Once token is deleted update UI.
+//           resetUI();
+//         })
+//         .catch((err) => {
+//           console.log('Unable to delete token. ', err);
+//         });
+//     })
+//     .catch((err) => {
+//       console.log('Error retrieving registration token. ', err);
+//       showToken('Error retrieving registration token.');
+//     });
+// }
 
 // Add a message to the messages element.
 function appendMessage(payload: MessagePayload) {
@@ -181,8 +175,8 @@ function updateUIForPushPermissionRequired() {
 document
   .getElementById('request-permission-button')!
   .addEventListener('click', requestPermission);
-document
-  .getElementById('delete-token-button')!
-  .addEventListener('click', deleteTokenFromFirebase);
+// document
+//   .getElementById('delete-token-button')!
+//   .addEventListener('click', deleteTokenFromFirebase);
 
 resetUI();
