@@ -35,5 +35,9 @@ async function initPush() {
   }
 }
 
+document
+  .getElementById('request-permission-button')!
+  .addEventListener('click', initPush);
+
 // Call it
 initPush();
